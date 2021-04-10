@@ -2,7 +2,7 @@ from random import randint
 from datetime import datetime, timedelta
 from airflow import DAG
 
-from airflow.control.operators.dataproc_operator import DataProcHiveOperator
+from airflow.contrib.operators.dataproc_operator import DataProcHiveOperator
 
 user_name = 'izykov'
 
