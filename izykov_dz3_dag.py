@@ -17,9 +17,9 @@ default_args = {
 }
 
 dag = DAG(
-    user_name + '_etl',
+    user_name + '_2nd_etl',
     default_args = default_args,
-    description = user_name + " Data Lake ETL",
+    description = user_name + " 2nd Data Lake ETL",
     schedule_interval = '0 0 1 1 *',
 )
 
