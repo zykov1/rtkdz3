@@ -8,7 +8,7 @@ user_name = 'izykov'
 
 default_args = {
     'owner': user_name,
-    'start_date': datetime(2020, 1, 1, 0, 0, 0),
+    'start_date': datetime(2013, 1, 1, 0, 0, 0),
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
