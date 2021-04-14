@@ -91,7 +91,7 @@ for table, hiveql in ods_tables.items():
         task_id = user_name + '_ods_' + table,
         dag = dag,
         query = hiveql,
-        cluster_name='cluster-dataproc',
+        cluster_name = 'cluster-dataproc',
         job_name = user_name + '_ods_' + table + '_{{ execution_date.year }}_{{ params.job_suffix }}',
         params = {"job_suffix": randint(0, 100000)},
         region = 'europe-west3',
@@ -117,8 +117,8 @@ for table, hiveql in ods_tables.items():
                 */
                 alter materialized view izykov.dm_traffic rebuild;
             """,
-            cluster_name='cluster-dataproc',
-            job_name = user_name + '_ods_' + table + '_{{ execution_date.year }}_{{ params.job_suffix }}',
+            cluster_name = 'cluster-dataproc',
+            job_name = user_name + '_dm_' + table + '_{{ execution_date.year }}_{{ params.job_suffix }}',
             params = {"job_suffix": randint(0, 100000)},
             region = 'europe-west3',
         )
