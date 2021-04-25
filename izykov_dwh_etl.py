@@ -9,7 +9,7 @@ USERNAME = 'izykov'
 
 default_args = {
     "owner": USERNAME,
-    "start_date": datetime(2013, 1, 1, 0, 0, 0)
+    "start_date": datetime(2013, 1, 1, 0, 0, 0),
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
