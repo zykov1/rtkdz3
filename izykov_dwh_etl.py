@@ -131,6 +131,7 @@ dds_sat_payment = PostgresOperator(
 INSERT INTO izykov.dds_sat_payment (
   SELECT PAY_PK, PAY_HASHDIFF, sum, effective_from, load_date, record_source
   FROM izykov.view_sat_payment_etl
+);
     """
 )
 
