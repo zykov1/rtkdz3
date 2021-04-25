@@ -41,6 +41,9 @@ ods_load_from_stg = PostgresOperator(
 ALTER TABLE izykov.ods_payment TRUNCATE PARTITION "{{ execution_date.year }}"; -- очистка партиции
 INSERT INTO izykov.ods_payment SELECT * FROM izykov.stg_payment 
   WHERE EXTRACT(YEAR FROM pay_date) = {{ execution_date.year }};
+REFRESH MATERIALIZED VIEW izykov.ods_mv_payment; -- postgres не позволяет партицировать mat.view,
+-- но, если нужда в производительности > нужды в свежих данных в dds, можно обновлять его отдельно,
+-- после загрузки всех ods
     """
 )
 
