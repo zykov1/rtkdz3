@@ -48,14 +48,14 @@ def load_ods():
 
 def load_dds():
   global ods_finish_dds_start
-  ods_finish = DummyOperator(task_id = "ods_finish", dag = dag)_dds_start
+  ods_finish_dds_start = DummyOperator(task_id = "ods_finish_dds_start", dag = dag)
   stg_finish_ods_start >> ods_finish_dds_start
   return
 
 def load_dm():
   # global dds_finish_dm_start
   dds_finish_dm_start = DummyOperator(task_id = "dds_finish_dm_start", dag = dag)
-  ods_finish >> dm_finish_dds_start
+  ods_finish_dds_start >> dds_finish_dm_start
   return
 
 def finish():
