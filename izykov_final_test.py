@@ -36,26 +36,26 @@ dag = DAG(
 
 ### Шаги общего алгоритма
 def start():
-  global stg_finish
-  stg_finish = DummyOperator(task_id = "stg_finish", dag = dag)
+  global stg_start
+  stg_start = DummyOperator(task_id = "stg_start", dag = dag)
   return
 
 def load_ods():
-  global ods_finish
-  ods_finish = DummyOperator(task_id = "ods_finish", dag = dag)
-  stg_finish >> ods_finish
+  global stg_finish_ods_start
+  stg_finish_ods_start = DummyOperator(task_id = "stg_finish_ods_start", dag = dag)
+  stg_start >> stg_finish_ods_start
   return
 
 def load_dds():
-  global dds_finish
-  dds_finish = DummyOperator(task_id = "dds_finish", dag = dag)
-  ods_finish >> dds_finish
+  global ods_finish_dds_start
+  ods_finish = DummyOperator(task_id = "ods_finish", dag = dag)_dds_start
+  stg_finish_ods_start >> ods_finish_dds_start
   return
 
 def load_dm():
-  # global dm_finish
-  dm_finish = DummyOperator(task_id = "dm_finish", dag = dag)
-  dds_finish >> dm_finish
+  # global dds_finish_dm_start
+  dds_finish_dm_start = DummyOperator(task_id = "dds_finish_dm_start", dag = dag)
+  ods_finish >> dm_finish_dds_start
   return
 
 def finish():
