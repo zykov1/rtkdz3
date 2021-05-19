@@ -4,13 +4,14 @@ from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
 
+USERNAME = 'izykov'
 import sys
-sys.path.append('/root/airflow/dags/izykov/')
+sys.path.append('/root/airflow/dags/' + USERNAME)
 import izykov_final_config as c
 
 ### Общий алгоритм
 def main():
-  c.test = 43535
+  c.test = 444
   start()
   load_ods()
   load_dds()
@@ -34,7 +35,7 @@ default_args = {
 dag = DAG(
     USERNAME + '_final_etl_test',
     default_args = default_args,
-    description = USERNAME + " FINAL ETL TEST",
+    description = USERNAME + ' FINAL ETL TEST',
     schedule_interval = "0 0 1 1 *"
 )
 
