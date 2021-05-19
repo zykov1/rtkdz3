@@ -1,8 +1,4 @@
-import sys
-sys.path.append(".")
-import izykov_final_config as c
 from datetime import timedelta, datetime
-# from random import randint
 
 from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
@@ -10,7 +6,6 @@ from airflow.operators.dummy_operator import DummyOperator
 
 ### Общий алгоритм
 def main():
-  c.test = 2
   start()
   load_ods()
   load_dds()
