@@ -13,7 +13,7 @@ import izykov_final_config as c
 ### Общие параметры DAG
 default_args = {
   "owner": USERNAME,
-  "begin_date": datetime(2013, 1, 1, 0, 0, 0),
+  "start_date": datetime(2013, 1, 1, 0, 0, 0),
   'depends_on_past': False,
   'email_on_failure': False,
   'email_on_retry': False,
