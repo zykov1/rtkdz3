@@ -10,6 +10,7 @@ import izykov_final_config as c
 
 ### Общий алгоритм
 def main():
+  c.test = 43535
   start()
   load_ods()
   load_dds()
