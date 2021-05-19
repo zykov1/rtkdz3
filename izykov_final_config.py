@@ -17,17 +17,16 @@ stg_tables = {
     'payment': """
         DROP EXTERNAL TABLE izykov.p_stg_payment_{{ execution_date.year }};
         CREATE EXTERNAL TABLE izykov.p_stg_payment_{{ execution_date.year }} (
-          user_id INT,
-          pay_doc_type TEXT,
-          pay_doc_num INT,
-          account TEXT,
-          phone NUMERIC(11,0),
-          billing_period TEXT,
-          pay_date DATE,
-          sum FLOAT
+            user_id INT,
+            pay_doc_type TEXT,
+            pay_doc_num INT,
+            account TEXT,
+            phone NUMERIC(11,0),
+            billing_period TEXT,
+            pay_date DATE,
+            sum FLOAT
         )
         LOCATION ('pxf://rt-2021-03-25-16-47-29-sfunu-final-project/payment/year={{ execution_date.year }}/?PROFILE=gs:parquet')
         FORMAT 'CUSTOM' (FORMATTER='pxfwritable_import');
     """,
-
 }
