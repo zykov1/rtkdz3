@@ -1,1 +1,1 @@
-stg_start, stg_finish_ods_start, ods_finish_dds_start, dds_finish_dm_start = None
+stg_begin, stg_end_ods_begin, ods_end_dds_begin, dds_end_dm_begin = (None,) * 4
