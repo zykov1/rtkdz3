@@ -40,11 +40,9 @@ def main():
 def begin():
     c.stg_begin = DummyOperator(task_id = "stg_begin", dag = dag)
     c.stg_end_ods_begin = DummyOperator(task_id = "stg_end_ods_begin", dag = dag)
-    c.stg_begin >> c.stg_end_ods_begin
     c.ods_end_dds_begin = DummyOperator(task_id = "ods_end_dds_begin", dag = dag)
-    c.stg_end_ods_begin >> c.ods_end_dds_begin
     c.dds_end_dm_begin = DummyOperator(task_id = "dds_end_dm_begin", dag = dag)
-    c.ods_end_dds_begin >> c.dds_end_dm_begin
+    c.stg_begin >> c.stg_end_ods_begin >> c.ods_end_dds_begin >> c.dds_end_dm_begin
     for table, sql in c.stg_tables.items():
         po = PostgresOperator(
             dag = dag,
