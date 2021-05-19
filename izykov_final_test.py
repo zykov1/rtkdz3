@@ -52,7 +52,7 @@ def begin():
             sql = sql
         )
         c.stg_begin >> po >> c.stg_end_ods_begin
-  return
+    return
 
 def load_ods():
     # c.stg_end_ods_begin = DummyOperator(task_id = "stg_end_ods_begin", dag = dag)
