@@ -1,4 +1,4 @@
-import izykov_final_config as c
+from . import izykov_final_config as c
 from datetime import timedelta, datetime
 # from random import randint
 
