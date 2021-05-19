@@ -4,6 +4,10 @@ from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
 
+import sys
+sys.path.append('/root/airflow/dags/izykov/')
+import izykov_final_config as c
+
 ### Общий алгоритм
 def main():
   start()
