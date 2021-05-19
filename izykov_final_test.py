@@ -36,20 +36,24 @@ dag = DAG(
 
 ### Шаги общего алгоритма
 def start():
+  global stg_finish
   stg_finish = DummyOperator(task_id = "stg_finish", dag = dag)
   return
 
 def load_ods():
+  global ods_finish
   ods_finish = DummyOperator(task_id = "ods_finish", dag = dag)
   stg_finish >> ods_finish
   return
 
 def load_dds():
+  global dds_finish
   dds_finish = DummyOperator(task_id = "dds_finish", dag = dag)
   ods_finish >> dds_finish
   return
 
 def load_dm():
+  # global dm_finish
   dm_finish = DummyOperator(task_id = "dm_finish", dag = dag)
   dds_finish >> dm_finish
   return
