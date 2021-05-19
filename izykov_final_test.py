@@ -1,4 +1,6 @@
-from . import izykov_final_config as c
+import sys
+sys.path.append(".")
+import izykov_final_config as c
 from datetime import timedelta, datetime
 # from random import randint
 
