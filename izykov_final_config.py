@@ -191,8 +191,6 @@ ods_tables = {
         ;
         ALTER TABLE izykov.p_ods_traffic TRUNCATE PARTITION "{{ execution_date.year }}"
         ;
-        DELETE FROM izykov.p_ods_traffic_1_prt_badyear WHERE EXTRACT(YEAR FROM timestamp) = {{ execution_date.year }}
-        ;
         INSERT INTO izykov.p_ods_traffic SELECT
             user_id,
             TIMESTAMP 'epoch' + timestamp * INTERVAL '1 millisecond',
