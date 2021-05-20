@@ -8,8 +8,8 @@ stg_begin, stg_end_ods_begin, ods_end_dds_begin, dds_end_dm_begin = (None,) * 4
 #  START (DATE '2031-01-01') END (DATE '2031-01-01') INCLUSIVE
 #  INTO (PARTITION "2031", PARTITION "badyear")
 parts = ''
-for y in range(2013, 2031):
-    parts = parts + f"  PARTITION \"{y}\" START (DATE '{y}-01-01') END (DATE '{y}-12-31') INCLUSIVE,\n"
+#for y in range(2013, 2031):
+#    parts = parts + f"  PARTITION \"{y}\" START (DATE '{y}-01-01') END (DATE '{y}-12-31') INCLUSIVE,\n"
 
 
 # Разбил stg-таблицы по годам (типа stg_billing_2013), т.к. индексации нет =>
