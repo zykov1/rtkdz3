@@ -12,14 +12,7 @@ for y in range(2013, 2031):
     parts = parts + " PARTITION \"%u\" START (DATE '%u-01-01') END (DATE '%u-01-01'),\n" % (y, y, ny)
 
 
-# Разбил stg-таблицы по годам (типа stg_billing_2013), т.к. индексации нет =>
-# генерация ods выборкой из каждой stg_таблицы_за_год работает гораздо быстрее,
-# чем из общей from izykov.p_stg_billing where year(created_at) = {{ execution_date.year }}
-# для каждого года - проверил!
-# Плюс, для ускорения, parquet'ы могут лежать физически на разных нодах. 
-# А партиции у внешних таблиц = проблемы.
-# (есть еще трюк с alter table ... exchange partition, но он дает гибрид - внутреннюю
-# таблицу с внешними партициями, и для него все равно нужно много внешних таблиц) 
+### Таблицы + SQL для заливки STG-слоя с учетом идемпотентности
 stg_tables = {
     'billing': """
         DROP EXTERNAL TABLE IF EXISTS izykov.p_stg_billing;
@@ -81,6 +74,7 @@ stg_tables = {
 }
 
 
+### Таблицы + SQL для заливки ODS-слоя с учетом идемпотентности
 ods_tables = {
     'billing': """
         CREATE TABLE IF NOT EXISTS izykov.p_ods_billing (
