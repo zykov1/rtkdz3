@@ -14,7 +14,7 @@ import izykov_final_config as c
 default_args = {
     'owner': USERNAME,
     'start_date': datetime(2013, 1, 1, 0, 0, 0),   # данные начинаются с 2013
-    'end_date': datetime(2019, 1, 1, 0, 0, 0),     # за 2020 - всего несколько строк в issue, больше данных НЕТ
+#    'end_date': datetime(2019, 1, 1, 0, 0, 0),     # за 2020 - всего несколько строк в issue, больше данных НЕТ
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
