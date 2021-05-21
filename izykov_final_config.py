@@ -1,6 +1,6 @@
 # Пока пустые объекты для tasks
 stg_begin, stg_end_ods_begin, ods_end_dds_begin, dds_end_dm_begin = (None,) * 4
-
+#test
 # Предопределенные для скорости партиции до 2030 года,
 # в случае исчерпания удобно (даже автоматически) добавлять через такую конструкцию
 #  SPLIT DEFAULT PARTITION
