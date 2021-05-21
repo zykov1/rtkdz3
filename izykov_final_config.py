@@ -50,6 +50,8 @@ ods_tables = {
                 DEFAULT PARTITION "badyear" -- чтобы не потерять данные с неверными годами
             )
         ;
+        ALTER EXTERNAL TABLE izykov.p_ods_billing OWNER TO izykov
+        ;
         ALTER TABLE izykov.p_ods_billing TRUNCATE PARTITION "{{ execution_date.year }}"
         ;
         INSERT INTO izykov.p_ods_billing SELECT
