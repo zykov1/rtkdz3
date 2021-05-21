@@ -73,7 +73,7 @@ def load_ods():
             task_id = 'ods_' + table + '_recreate',
             sql = sql
         )
-        c.stg_end_ods_begin >> po >> c.ods_end_stg_begin
+        c.stg_end_ods_begin >> po >> c.ods_end_dds_begin
     return
 
 def load_dds():
