@@ -50,7 +50,7 @@ def begin():
                 EXECUTE $1;
             END
             ';
-            ALTER FUNCTION izykov.runit OWNER TO izykov;
+            ALTER FUNCTION izykov.runit(TEXT) OWNER TO izykov;
         """
     )
     c.stg_end_ods_begin = DummyOperator(task_id = "stg_end_ods_begin", dag = dag)
