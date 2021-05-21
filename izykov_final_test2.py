@@ -22,7 +22,7 @@ default_args = {
     'retry_delay': timedelta(minutes = 3)
 }
 dag = DAG(
-    USERNAME + '_final_etl_test1',
+    USERNAME + '_final_etl_test2',
     default_args = default_args,
     description = USERNAME + ' FINAL ETL TEST',
     schedule_interval = "0 0 1 1 *",
