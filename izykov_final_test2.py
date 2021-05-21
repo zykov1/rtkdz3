@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-#test гриф
+
 from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
@@ -22,7 +22,7 @@ default_args = {
     'retry_delay': timedelta(minutes = 3)
 }
 dag = DAG(
-    USERNAME + '_final_etl_test2',
+    USERNAME + '_final_etl_test',
     default_args = default_args,
     description = USERNAME + ' FINAL ETL TEST',
     schedule_interval = "0 0 1 1 *",
