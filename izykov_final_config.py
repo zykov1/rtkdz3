@@ -55,10 +55,10 @@ ods_tables = {
         ALTER TABLE izykov.p_ods_billing TRUNCATE PARTITION "{{ execution_date.year }}"
         ;
         INSERT INTO izykov.p_ods_billing SELECT
-            user_id INT,
+            user_id,
             TO_DATE(billing_period, 'YYYY-MM'),
-            service TEXT,
-            tariff TEXT,
+            service,
+            tariff,
             sum::INT,
             created_at
             FROM izykov.p_stg_billing WHERE EXTRACT(YEAR FROM created_at) = {{ execution_date.year }}
