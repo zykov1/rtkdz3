@@ -240,7 +240,7 @@ ods_tables = {
             registered_at::DATE,
             billing_mode,
             is_vip
-        FROM izykov.p_stg_traffic
+        FROM mdm.user
         ;
     $$) WHERE (TO_REGCLASS('izykov.p_ods_user')) IS NULL;
     """,
