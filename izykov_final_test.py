@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-# change test
+
 from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
@@ -19,13 +19,14 @@ default_args = {
     'email_on_failure': False,
     'email_on_retry': False,
     "retries": 0,
-    'retry_delay': timedelta(minutes = 3),
+    'retry_delay': timedelta(minutes = 3)
 }
 dag = DAG(
     USERNAME + '_final_etl_test',
     default_args = default_args,
     description = USERNAME + ' FINAL ETL TEST',
-    schedule_interval = "0 0 1 1 *"
+    schedule_interval = "0 0 1 1 *",
+    max_active_runs = 1
 )
 
 ### Главный алгоритм
@@ -39,7 +40,19 @@ def main():
 
 ### Детали главного алгоритма
 def begin():
-    c.stg_begin = DummyOperator(task_id = "stg_begin", dag = dag)
+    # c.stg_begin = DummyOperator(task_id = "stg_begin", dag = dag)
+    c.stg_begin = PostgresOperator(
+        task_id = "stg_begin",
+        dag = dag, # ниже функция для создания stg-таблиц только в случае, если их нет (IF NOT EXISTS для EXTERNAL TABLE не работает)
+        sql = """
+            CREATE OR REPLACE FUNCTION izykov.runit(TEXT) RETURNS VOID LANGUAGE plpgsql AS '
+            BEGIN
+                EXECUTE $1;
+            END
+            ';
+            ALTER FUNCTION izykov.runit OWNER TO izykov;
+        """
+    )
     c.stg_end_ods_begin = DummyOperator(task_id = "stg_end_ods_begin", dag = dag)
     c.ods_end_dds_begin = DummyOperator(task_id = "ods_end_dds_begin", dag = dag)
     c.dds_end_dm_begin = DummyOperator(task_id = "dds_end_dm_begin", dag = dag)
@@ -54,22 +67,23 @@ def begin():
     return
 
 def load_ods():
-    # c.stg_end_ods_begin = DummyOperator(task_id = "stg_end_ods_begin", dag = dag)
-    # c.stg_begin >> c.stg_end_ods_begin
+    for table, sql in c.ods_tables.items():
+        po = PostgresOperator(
+            dag = dag,
+            task_id = 'ods_' + table + '_recreate',
+            sql = sql
+        )
+        c.stg_end_ods_begin >> po >> c.ods_end_stg_begin
     return
 
 def load_dds():
-    # c.ods_end_dds_begin = DummyOperator(task_id = "ods_end_dds_begin", dag = dag)
-    # c.stg_end_ods_begin >> c.ods_end_dds_begin
     return
 
 def load_dm():
-    # c.dds_end_dm_begin = DummyOperator(task_id = "dds_end_dm_begin", dag = dag)
-    # c.ods_end_dds_begin >> c.dds_end_dm_begin
     return
 
 def end():
     return
 
-### Запуск общего алгоритма
+### Запуск главного алгоритма
 main()
