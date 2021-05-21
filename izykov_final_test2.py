@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-#test1
+#test гриф
 from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
