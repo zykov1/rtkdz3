@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.latest_only_operator import LatestOnlyOperator
-# собака
+
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
 import sys
@@ -91,9 +91,14 @@ def load_mviews():
         c.ods_end_mviews_begin >> po >> c.mviews_end_dds_hubs_begin
     return
 
-
 def load_dds_hubs():
-    c.mviews_end_dds_hubs_begin >> c.dds_hubs_end_dds_links_begin
+    for table, sql in c.dds_hubs.items():
+        po = PostgresOperator(
+            dag = dag,
+            task_id = 'dds_hub_' + table + '_load',
+            sql = sql
+        )
+        c.mviews_end_dds_hubs_begin >> c.dds_hubs_end_dds_links_begin
     return
 
 def load_dds_links():
