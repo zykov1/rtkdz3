@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-# еж
+
 from airflow import DAG
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
@@ -35,8 +35,6 @@ c.mviews_end_dds_hubs_begin = DummyOperator(task_id = "mviews_end_dds_hubs_begin
 # c.dds_hubs_end_dds_links_begin = DummyOperator(task_id = "dds_hubs_end_dds_links_begin", dag = dag)
 # c.dds_links_end_dds_sats_begin = DummyOperator(task_id = "dds_links_end_dds_sats_begin", dag = dag)
 # c.dds_sats_end_dm_begin = DummyOperator(task_id = "dds_sats_end_dm_begin", dag = dag)
-### собственно, лишние прямые связи - потом надо бы убрать
-# c.stg_begin >> c.stg_end_ods_begin >> c.ods_end_dds_begin >> c.dds_end_dm_begin
 
 ### Главный алгоритм
 def main():
@@ -52,7 +50,6 @@ def main():
 
 ### Детали главного алгоритма
 def load_stg():
-    # c.stg_begin = DummyOperator(task_id = "stg_begin", dag = dag)
     c.stg_begin = PostgresOperator(
         task_id = "stg_begin",
         dag = dag, # ниже функция для создания stg-таблиц только в случае, если их нет (IF NOT EXISTS для EXTERNAL TABLE не работает)
