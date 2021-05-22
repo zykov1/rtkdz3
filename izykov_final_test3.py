@@ -1,8 +1,8 @@
 from datetime import timedelta, datetime
-
 from airflow import DAG
-from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.postgres_operator import PostgresOperator
+from airflow.operators.latest_only_operator import LatestOnlyOperator
 
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
@@ -29,11 +29,12 @@ dag = DAG(
     concurrency=1,
     max_active_runs = 1
 )
+# все dummy-точки сбора
 c.stg_end_ods_begin = DummyOperator(task_id = "stg_end_ods_begin", dag = dag)
 c.ods_end_mviews_begin = DummyOperator(task_id = "ods_end_mviews_begin", dag = dag)
 c.mviews_end_dds_hubs_begin = DummyOperator(task_id = "mviews_end_dds_hubs_begin", dag = dag)
-# c.dds_hubs_end_dds_links_begin = DummyOperator(task_id = "dds_hubs_end_dds_links_begin", dag = dag)
-# c.dds_links_end_dds_sats_begin = DummyOperator(task_id = "dds_links_end_dds_sats_begin", dag = dag)
+c.dds_hubs_end_dds_links_begin = DummyOperator(task_id = "dds_hubs_end_dds_links_begin", dag = dag)
+c.dds_links_end_dds_sats_begin = DummyOperator(task_id = "dds_links_end_dds_sats_begin", dag = dag)
 # c.dds_sats_end_dm_begin = DummyOperator(task_id = "dds_sats_end_dm_begin", dag = dag)
 
 ### Главный алгоритм
@@ -41,12 +42,11 @@ def main():
     load_stg()
     load_ods()
     load_mviews()
-    # load_dds_hubs()
-    # load_dds_links()
-    # load_dds_sats()
-    # load_dm()
-    # end()
-### Конец    
+    load_dds_hubs()
+    load_dds_links()
+    load_dds_sats()
+    load_dm()
+### Конец
 
 ### Детали главного алгоритма
 def load_stg():
@@ -92,14 +92,25 @@ def load_mviews():
     return
 
 
-# def load_dds():
-#     return
+def load_dds_hubs():
+    c.mviews_end_dds_hubs_begin >> c.dds_hubs_end_dds_links_begin
+    return
 
-# def load_dm():
-#     return
+def load_dds_links():
+    c.dds_hubs_end_dds_links_begin >> c.dds_links_end_dds_sats_begin
+    return
 
-# def end():
-#     return
+def load_dds_sats():
+    c.dds_links_end_dds_sats_begin >> c.dds_sats_end_dm_begin
+    return
+
+def load_dm():
+    loo = LatestOnlyOperator(task_id = "dm_latest_only", dag = dag)
+    load_tmp_report = DummyOperator(task_id = "load_tmp_report", dag = dag)
+    load_dimensions = DummyOperator(task_id = "load_dimensions", dag = dag)
+    load_facts = DummyOperator(task_id = "load_facts", dag = dag)
+    c.dds_sats_end_dm_begin >> loo >> load_tmp_report >> load_dimensions >> load_facts
+    return
 
 ### Запуск главного алгоритма
 main()
