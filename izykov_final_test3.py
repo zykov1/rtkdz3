@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.latest_only_operator import LatestOnlyOperator
-
+# собака
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
 import sys
@@ -35,7 +35,7 @@ c.ods_end_mviews_begin = DummyOperator(task_id = "ods_end_mviews_begin", dag = d
 c.mviews_end_dds_hubs_begin = DummyOperator(task_id = "mviews_end_dds_hubs_begin", dag = dag)
 c.dds_hubs_end_dds_links_begin = DummyOperator(task_id = "dds_hubs_end_dds_links_begin", dag = dag)
 c.dds_links_end_dds_sats_begin = DummyOperator(task_id = "dds_links_end_dds_sats_begin", dag = dag)
-# c.dds_sats_end_dm_begin = DummyOperator(task_id = "dds_sats_end_dm_begin", dag = dag)
+c.dds_sats_end_dm_begin = DummyOperator(task_id = "dds_sats_end_dm_begin", dag = dag)
 
 ### Главный алгоритм
 def main():
