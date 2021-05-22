@@ -1,6 +1,7 @@
 # Пока пустые объекты для tasks
-stg_begin, stg_end_ods_begin, ods_end_dds_begin, dds_end_dm_begin = (None,) * 4
-# лосось
+stg_begin, stg_end_ods_begin, ods_end_mviews_begin, mviews_end_dds_hubs_begin,
+dds_hubs_end_dds_links_begin, dds_links_end_dds_sats_begin, dds_sats_end_dm_begin = (None,) * 7
+
 # Предопределенные для скорости партиции до 2030 года,
 # в случае исчерпания удобно (даже автоматически) добавлять через такую конструкцию
 #  SPLIT DEFAULT PARTITION
@@ -245,3 +246,12 @@ ods_tables = {
     $$) WHERE (TO_REGCLASS('izykov.p_ods_user')) IS NULL;
     """,
 }
+
+
+### mviews
+mviews = {
+    'payment': """
+    SELECT 1;
+    """,
+}
+
