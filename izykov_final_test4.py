@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.latest_only_operator import LatestOnlyOperator
-# жираф
+# жирафле
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
 import sys
