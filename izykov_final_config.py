@@ -726,4 +726,93 @@ dds_hubs = {
     );
     """,
 
+    'billing_period':"""
+    CREATE TABLE IF NOT EXISTS izykov.p_dds_hub_billing_period (
+        BILLING_PERIOD_PK UUID, 
+        BILLING_PERIOD_KEY VARCHAR, 
+        LOAD_DATE TIMESTAMP, 
+        RECORD_SOURCE VARCHAR
+    );
+    ALTER TABLE izykov.p_dds_hub_billing_period OWNER TO izykov;
+    WITH row_rank_1 AS (
+    SELECT *
+    FROM (
+    SELECT BILLING_PERIOD_PK, BILLING_PERIOD_KEY, LOAD_DATE, RECORD_SOURCE, ROW_NUMBER() over (PARTITION BY BILLING_PERIOD_PK
+    ORDER BY LOAD_DATE ASC
+                ) AS row_num
+    FROM izykov.p_mv_payment_{{ execution_date.year }}        
+        ) AS h
+    WHERE row_num = 1
+    ),
+    row_rank_2 AS (
+    SELECT *
+    FROM (
+    SELECT BILLING_PERIOD_PK, BILLING_PERIOD_KEY, LOAD_DATE, RECORD_SOURCE, ROW_NUMBER() over (PARTITION BY BILLING_PERIOD_PK
+    ORDER BY LOAD_DATE ASC
+                ) AS row_num
+    FROM izykov.p_mv_billing_{{ execution_date.year }}        
+        ) AS h
+    WHERE row_num = 1
+    ),
+    stage_union AS (
+    SELECT BILLING_PERIOD_PK, BILLING_PERIOD_KEY, LOAD_DATE, RECORD_SOURCE
+    FROM row_rank_1 UNION ALL
+    SELECT BILLING_PERIOD_PK, BILLING_PERIOD_KEY, LOAD_DATE, RECORD_SOURCE
+    FROM row_rank_2
+    ),
+    raw_union AS (
+    SELECT *
+    FROM (
+    SELECT BILLING_PERIOD_PK, BILLING_PERIOD_KEY, LOAD_DATE, RECORD_SOURCE, ROW_NUMBER() over (PARTITION BY BILLING_PERIOD_PK
+    ORDER BY LOAD_DATE ASC
+                ) AS row_num
+    FROM stage_union
+    WHERE BILLING_PERIOD_PK IS NOT NULL
+        ) AS h
+    WHERE row_num = 1   
+    ),  
+    records_to_insert AS (
+    SELECT a.BILLING_PERIOD_PK, a.BILLING_PERIOD_KEY, a.LOAD_DATE, a.RECORD_SOURCE
+    FROM raw_union AS a
+    LEFT JOIN izykov.p_dds_hub_billing_period AS d ON a.BILLING_PERIOD_PK = d.BILLING_PERIOD_PK
+    WHERE d.BILLING_PERIOD_PK IS NULL
+    )
+    INSERT INTO izykov.p_dds_hub_billing_period (BILLING_PERIOD_PK, BILLING_PERIOD_KEY, LOAD_DATE, RECORD_SOURCE)
+    (
+    SELECT BILLING_PERIOD_PK, BILLING_PERIOD_KEY, LOAD_DATE, RECORD_SOURCE
+    FROM records_to_insert
+    );
+    """,
+
+    'pay_doc_type': """
+    CREATE TABLE IF NOT EXISTS izykov.p_dds_hub_pay_doc_type (
+        PAY_DOC_TYPE_PK UUID, 
+        PAY_DOC_TYPE_KEY VARCHAR, 
+        LOAD_DATE TIMESTAMP, 
+        RECORD_SOURCE VARCHAR
+    );
+    ALTER TABLE izykov.p_dds_hub_pay_doc_type OWNER TO izykov;
+    WITH row_rank_1 AS (
+    SELECT *
+    FROM (
+    SELECT PAY_DOC_TYPE_PK, PAY_DOC_TYPE_KEY, LOAD_DATE, RECORD_SOURCE, ROW_NUMBER() over (PARTITION BY PAY_DOC_TYPE_PK
+    ORDER BY LOAD_DATE ASC
+                    ) AS row_num
+    FROM izykov.p_mv_payment_{{ execution_date.year }}
+            ) AS h
+    WHERE row_num = 1
+        ),  
+    records_to_insert AS (
+    SELECT a.PAY_DOC_TYPE_PK, a.PAY_DOC_TYPE_KEY, a.LOAD_DATE, a.RECORD_SOURCE
+    FROM row_rank_1 AS a
+    LEFT JOIN izykov.p_dds_hub_pay_doc_type AS d ON a.PAY_DOC_TYPE_PK = d.PAY_DOC_TYPE_PK
+    WHERE d.PAY_DOC_TYPE_PK IS NULL
+    )
+    INSERT INTO izykov.p_dds_hub_pay_doc_type (PAY_DOC_TYPE_PK, PAY_DOC_TYPE_KEY, LOAD_DATE, RECORD_SOURCE)
+    (
+    SELECT PAY_DOC_TYPE_PK, PAY_DOC_TYPE_KEY, LOAD_DATE, RECORD_SOURCE
+    FROM records_to_insert
+    );
+    """,
+
 }
