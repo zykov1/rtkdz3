@@ -98,7 +98,7 @@ def load_dds_hubs():
             task_id = 'dds_hub_' + table + '_load',
             sql = sql
         )
-        c.mviews_end_dds_hubs_begin >> c.dds_hubs_end_dds_links_begin
+        c.mviews_end_dds_hubs_begin >> po >> c.dds_hubs_end_dds_links_begin
     return
 
 def load_dds_links():
