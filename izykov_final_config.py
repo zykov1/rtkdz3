@@ -269,8 +269,6 @@ mviews = {
                     billing_mode:: VARCHAR AS BILLING_MODE_KEY,
                     'MDM - DATA LAKE':: VARCHAR AS RECORD_SOURCE
     FROM izykov.p_ods_user
-    WHERE CAST(EXTRACT('year'
-    FROM registered_at) AS int) = 2013
             ),
             
             hashed_columns AS (
@@ -316,7 +314,7 @@ mviews = {
     FROM columns_to_select
         )
     SELECT *,           
-         '2013-01-13':: TIMESTAMP AS LOAD_DATE,
+         '{{ execution_date }}':: TIMESTAMP AS LOAD_DATE,
                 registered_at AS EFFECTIVE_FROM
     FROM staging
     );
