@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.latest_only_operator import LatestOnlyOperator
-# собака
+# кит
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
 import sys
@@ -106,9 +106,9 @@ def load_dds_sats():
 
 def load_dm():
     loo = LatestOnlyOperator(task_id = "dm_latest_only", dag = dag)
-    load_tmp_report = DummyOperator(task_id = "load_tmp_report", dag = dag)
-    load_dimensions = DummyOperator(task_id = "load_dimensions", dag = dag)
-    load_facts = DummyOperator(task_id = "load_facts", dag = dag)
+    load_tmp_report = DummyOperator(task_id = "dm_tmp_begin", dag = dag)
+    dm_tmp_end_dm_dims_begin = DummyOperator(task_id = "dm_tmp_end_dm_dims_begin", dag = dag)
+    dm_dims_end_dm_facts = DummyOperator(task_id = "dm_dims_end_dm_facts", dag = dag)
     c.dds_sats_end_dm_begin >> loo >> load_tmp_report >> load_dimensions >> load_facts
     return
 
