@@ -13,6 +13,7 @@ for y in range(2013, 2031):
     parts = parts + " PARTITION \"%u\" START (DATE '%u-01-01') END (DATE '%u-01-01'),\n" % (y, y, ny)
 
 
+
 ### Таблицы + SQL для заливки STG-слоя с учетом идемпотентности
 stg_tables = {
     'billing': """
@@ -81,6 +82,7 @@ stg_tables = {
     $$) WHERE (TO_REGCLASS('izykov.p_stg_traffic')) IS NULL;
     """
 }
+
 
 
 ### Таблицы + SQL для заливки ODS-слоя с учетом идемпотентности
@@ -246,6 +248,7 @@ ods_tables = {
     $$) WHERE (TO_REGCLASS('izykov.p_ods_user')) IS NULL;
     """,
 }
+
 
 
 ### matviews для поддержки генерации DDS
@@ -557,7 +560,7 @@ mviews = {
                     USER_KEY,
                     DEVICE_KEY,
                     IP_ADDR_KEY,
-                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_id AS VARCHAR))), ''))) AS UUID) AS DEVICE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS VARCHAR))), ''))) AS UUID) AS IP_ADDR_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS VARCHAR))), ''), '^^')                  
+                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_id AS VARCHAR))), ''))) AS UUID) AS DEVICE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS VARCHAR))), ''))) AS UUID) AS IP_ADDR_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS VARCHAR))), ''), '^^')
                     ), '^^||^^||^^')) AS UUID) AS TRAFFIC_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(timestamp AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(bytes_sent AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(bytes_received AS VARCHAR))), ''), '^^')
                     )) AS TEXT) AS TRAFFIC_HASHDIFF
     FROM derived_columns
@@ -593,6 +596,7 @@ mviews = {
     ALTER MATERIALIZED VIEW izykov.p_mv_traffic_{{ execution_date.year }} OWNER TO izykov;
     """
 }
+
 
 
 ### Таблицы + SQL для заливки хабов DDS-слоя
@@ -687,6 +691,37 @@ dds_hubs = {
     INSERT INTO izykov.p_dds_hub_user (USER_PK, USER_KEY, LOAD_DATE, RECORD_SOURCE)
     (
     SELECT USER_PK, USER_KEY, LOAD_DATE, RECORD_SOURCE
+    FROM records_to_insert
+    );
+    """,
+
+    'account':"""
+    CREATE TABLE IF NOT EXISTS izykov.p_dds_hub_account (
+        ACCOUNT_PK UUID, 
+        ACCOUNT_KEY VARCHAR, 
+        LOAD_DATE TIMESTAMP, 
+        RECORD_SOURCE VARCHAR
+    );
+    ALTER TABLE izykov.p_dds_hub_account OWNER TO izykov;
+    WITH row_rank_1 AS (
+    SELECT *
+    FROM (
+    SELECT ACCOUNT_PK, ACCOUNT_KEY, LOAD_DATE, RECORD_SOURCE, pay_date, ROW_NUMBER() over (PARTITION BY ACCOUNT_PK
+    ORDER BY LOAD_DATE ASC
+                    ) AS row_num
+    FROM izykov.p_mv_payment_{{ execution_date.year }}        
+            ) AS h
+    WHERE row_num = 1
+        ),  
+    records_to_insert AS (
+    SELECT a.ACCOUNT_PK, a.ACCOUNT_KEY, a.LOAD_DATE, a.RECORD_SOURCE
+    FROM row_rank_1 AS a
+    LEFT JOIN izykov.p_dds_hub_account AS d ON a.ACCOUNT_PK = d.ACCOUNT_PK
+    WHERE d.ACCOUNT_PK IS NULL
+    )
+    INSERT INTO izykov.p_dds_hub_account (ACCOUNT_PK, ACCOUNT_KEY, LOAD_DATE, RECORD_SOURCE)
+    (
+    SELECT ACCOUNT_PK, ACCOUNT_KEY, LOAD_DATE, RECORD_SOURCE
     FROM records_to_insert
     );
     """,
