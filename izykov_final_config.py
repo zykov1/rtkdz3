@@ -1159,7 +1159,7 @@ dm_facts = {
       , CONSTRAINT fk_registration_year FOREIGN KEY(registration_year_id) REFERENCES izykov.p_report_dim_registration_year(id)
       , CONSTRAINT fk_billing_mode FOREIGN KEY(billing_mode_id) REFERENCES izykov.p_report_dim_billing_mode(id)
     );
-    ALTER TABLE izykov.p_report_dim_billing_mode OWNER TO izykov;
+    ALTER TABLE izykov.p_report_fct OWNER TO izykov;
     INSERT INTO izykov.p_report_fct
       SELECT
         by.id
