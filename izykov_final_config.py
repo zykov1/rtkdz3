@@ -1094,6 +1094,7 @@ dm_tmp = {
     FROM raw_data
     GROUP BY billing_year, legal_type, district, registration_year, billing_mode, is_vip
     ORDER BY billing_year, legal_type, district, registration_year, billing_mode, is_vip
+    ;
     ALTER TABLE izykov.p_report_tmp OWNER TO izykov;
     """
 }
