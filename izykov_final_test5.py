@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.latest_only_operator import LatestOnlyOperator
-
+# единорог
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
 import sys
@@ -22,7 +22,7 @@ default_args = {
     'retry_delay': timedelta(minutes = 3)
 }
 dag = DAG(
-    USERNAME + '_final_etl_test4',
+    USERNAME + '_final_etl_test5',
     default_args = default_args,
     description = USERNAME + ' FINAL ETL TEST',
     schedule_interval = "0 0 1 1 *",
