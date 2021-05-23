@@ -1,7 +1,7 @@
 # Пока пустые объекты для tasks
 (stg_begin, stg_end_ods_begin, ods_end_mviews_begin, mviews_end_dds_hubs_begin, dds_hubs_end_dds_links_begin,
 dds_links_end_dds_sats_begin, dds_sats_end_dm_begin) = (None,) * 7
-# единорог
+
 # Предопределенные для скорости партиции до 2030 года,
 # в случае исчерпания удобно (даже автоматически) добавлять через такую конструкцию
 #  SPLIT DEFAULT PARTITION
@@ -1065,5 +1065,116 @@ dds_sats = {
     FROM records_to_insert
     );
     """,
-
 }
+
+
+
+### tmp-таблицы для отчетов
+dm_tmp = {
+    'payment_report':"""
+    DROP TABLE IF EXISTS izykov.p_report_tmp;
+    CREATE TABLE izykov.p_report_tmp AS
+    WITH raw_data AS (
+      SELECT
+        legal_type
+        , district
+        , EXTRACT(YEAR FROM registered_at) AS registration_year
+        , billing_mode
+        , is_vip
+        , EXTRACT(YEAR FROM billing_period_key::DATE) AS billing_year
+        , billing_period_key
+        , sum AS billing_sum
+      FROM izykov.p_dds_link_payment pl
+      JOIN izykov.p_dds_sat_payment ps ON pl.payment_pk = ps.payment_pk
+      JOIN izykov.p_dds_hub_billing_period hbp ON pl.billing_period_pk = hbp.billing_period_pk
+      JOIN izykov.p_dds_hub_user hu ON pl.user_pk = hu.user_pk
+      LEFT JOIN izykov.p_ods_user mu ON hu.user_key = mu.user_id::TEXT
+    )
+    SELECT billing_year::SMALLINT, legal_type, district, registration_year::SMALLINT, billing_mode, is_vip, sum(billing_sum)::BIGINT AS tot_sum
+    FROM raw_data
+    GROUP BY billing_year, legal_type, district, registration_year, billing_mode, is_vip
+    ORDER BY billing_year, legal_type, district, registration_year, billing_mode, is_vip
+    ALTER TABLE izykov.p_report_tmp OWNER TO izykov;
+    """
+}
+
+
+
+# Измерения отчетов
+dm_dims = {
+    'payment_billing_year':"""
+    DROP TABLE IF EXISTS izykov.p_report_dim_billing_year;
+    CREATE TABLE izykov.p_report_dim_billing_year(id SMALLSERIAL PRIMARY KEY, billing_year_key SMALLINT);
+    ALTER TABLE izykov.p_report_dim_billing_year OWNER TO izykov;
+    INSERT INTO izykov.p_report_dim_billing_year (billing_year_key) SELECT DISTINCT billing_year FROM izykov.p_report_tmp ORDER BY billing_year;
+    """, 
+
+    'payment_legal_type':"""
+    DROP TABLE IF EXISTS izykov.p_report_dim_legal_type;
+    CREATE TABLE izykov.p_report_dim_legal_type(id SMALLSERIAL PRIMARY KEY, legal_type_key TEXT);
+    ALTER TABLE izykov.p_report_dim_legal_type OWNER TO izykov;
+    INSERT INTO izykov.p_report_dim_legal_type (legal_type_key) SELECT DISTINCT legal_type FROM izykov.p_report_tmp ORDER BY legal_type;
+    """, 
+
+    'payment_district':"""
+    DROP TABLE IF EXISTS izykov.p_report_dim_district;
+    CREATE TABLE izykov.p_report_dim_district(id SMALLSERIAL PRIMARY KEY, district_key TEXT);
+    ALTER TABLE izykov.p_report_dim_district OWNER TO izykov;
+    INSERT INTO izykov.p_report_dim_district (district_key) SELECT DISTINCT district FROM izykov.p_report_tmp ORDER BY district;
+    """, 
+
+    'payment_registration_year':"""
+    DROP TABLE IF EXISTS izykov.p_report_dim_registration_year;
+    CREATE TABLE izykov.p_report_dim_registration_year(id SMALLSERIAL PRIMARY KEY, registration_year_key SMALLINT);
+    ALTER TABLE izykov.p_report_dim_registration_year OWNER TO izykov;
+    INSERT INTO izykov.p_report_dim_registration_year (registration_year_key) SELECT DISTINCT registration_year FROM izykov.p_report_tmp ORDER BY registration_year;
+    """, 
+
+    'payment_billing_mode':"""
+    DROP TABLE IF EXISTS izykov.p_report_dim_billing_mode;
+    CREATE TABLE izykov.p_report_dim_billing_mode(id SMALLSERIAL PRIMARY KEY, billing_mode_key TEXT);
+    ALTER TABLE izykov.p_report_dim_billing_mode OWNER TO izykov;
+    INSERT INTO izykov.p_report_dim_billing_mode (billing_mode_key) SELECT DISTINCT billing_mode FROM izykov.p_report_tmp ORDER BY billing_mode;
+    """
+}
+
+
+
+# Факты
+dm_facts = {
+    'payment':"""
+    DROP TABLE IF EXISTS izykov.p_report_fct;
+    CREATE TABLE izykov.p_report_fct(
+      billing_year_id SMALLINT
+      , legal_type_id SMALLINT
+      , district_id SMALLINT
+      , registration_year_id SMALLINT
+      , billing_mode_id SMALLINT
+      , is_vip BOOLEAN
+      , tot_sum BIGINT
+      , CONSTRAINT fk_billing_year FOREIGN KEY(billing_year_id) REFERENCES izykov.p_report_dim_billing_year(id)
+      , CONSTRAINT fk_legal_type FOREIGN KEY(legal_type_id) REFERENCES izykov.p_report_dim_legal_type(id)
+      , CONSTRAINT fk_district FOREIGN KEY(district_id) REFERENCES izykov.p_report_dim_district(id)
+      , CONSTRAINT fk_registration_year FOREIGN KEY(registration_year_id) REFERENCES izykov.p_report_dim_registration_year(id)
+      , CONSTRAINT fk_billing_mode FOREIGN KEY(billing_mode_id) REFERENCES izykov.p_report_dim_billing_mode(id)
+    );
+    ALTER TABLE izykov.p_report_dim_billing_mode OWNER TO izykov;
+    INSERT INTO izykov.p_report_fct
+      SELECT
+        by.id
+        , l.id
+        , d.id
+        , ry.id
+        , bm.id
+        , is_vip
+        , tot_sum
+        FROM izykov.p_report_tmp t
+        JOIN izykov.p_report_dim_billing_year by ON t.billing_year = by.billing_year_key
+        JOIN izykov.p_report_dim_legal_type l ON t.legal_type = l.legal_type_key
+        JOIN izykov.p_report_dim_district d ON t.district = d.district_key
+        JOIN izykov.p_report_dim_registration_year ry ON t.registration_year = ry.registration_year_key
+        JOIN izykov.p_report_dim_billing_mode bm ON t.billing_mode = bm.billing_mode_key
+    """
+}
+
+
