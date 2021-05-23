@@ -13,8 +13,8 @@ import izykov_final_config as c
 ### Общие параметры DAG
 default_args = {
     'owner': USERNAME,
-    'start_date': datetime(2013, 1, 1, 0, 0, 0),   # у нас данные начинаются с 2013, идут до 2019, за 2020 - всего несколько строк в issue
-    # 'end_date': datetime(2019, 1, 1, 0, 0, 0),   # минус ограничения: не работает LatestOnlyOperator
+    'start_date': datetime(2013, 1, 1, 0, 0, 0), # у нас данные начинаются с 2013, идут до 2019, за 2020 - всего несколько строк в issue
+    # 'end_date': datetime(2019, 1, 1, 0, 0, 0), # минус ограничения: не работает LatestOnlyOperator
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
