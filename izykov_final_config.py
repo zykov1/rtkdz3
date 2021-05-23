@@ -253,9 +253,9 @@ ods_tables = {
 
 ### matviews для поддержки генерации DDS
 mviews = {
-    'user': """
-    DROP MATERIALIZED VIEW IF EXISTS izykov.p_mv_user;
-    CREATE MATERIALIZED VIEW izykov.p_mv_user AS (WITH staging AS (WITH derived_columns AS (
+    'mdm': """
+    DROP MATERIALIZED VIEW IF EXISTS izykov.p_mv_mdm;
+    CREATE MATERIALIZED VIEW izykov.p_mv_mdm AS (WITH staging AS (WITH derived_columns AS (
     SELECT
                     user_id,
                     legal_type,
@@ -263,11 +263,11 @@ mviews = {
                     registered_at,
                     billing_mode,
                     is_vip,
-                    user_id:: VARCHAR AS USER_KEY,
-                    legal_type:: VARCHAR AS LEGAL_TYPE_KEY,
-                    district:: VARCHAR AS DISTRICT_KEY,
-                    billing_mode:: VARCHAR AS BILLING_MODE_KEY,
-                    'MDM - DATA LAKE':: VARCHAR AS RECORD_SOURCE
+                    user_id:: TEXT AS USER_KEY,
+                    legal_type:: TEXT AS LEGAL_TYPE_KEY,
+                    district:: TEXT AS DISTRICT_KEY,
+                    billing_mode:: TEXT AS BILLING_MODE_KEY,
+                    'MDM - DATA LAKE':: TEXT AS RECORD_SOURCE
     FROM izykov.p_ods_user
             ),
             
@@ -283,9 +283,9 @@ mviews = {
                     LEGAL_TYPE_KEY,
                     DISTRICT_KEY,
                     BILLING_MODE_KEY,               
-                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(legal_type AS VARCHAR))), ''))) AS UUID) AS LEGAL_TYPE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(district AS VARCHAR))), ''))) AS UUID) AS DISTRICT_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(billing_mode AS VARCHAR))), ''))) AS UUID) AS BILLING_MODE_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(legal_type AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(district AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(billing_mode AS VARCHAR))), ''), '^^')
-                    ), '^^||^^||^^||^^')) AS UUID) AS MDM_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(registered_at AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(is_vip AS VARCHAR))), ''), '^^')
-                    )) AS TEXT) AS MDM_HASHDIFF
+                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(legal_type AS TEXT))), ''))) AS UUID) AS LEGAL_TYPE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(district AS TEXT))), ''))) AS UUID) AS DISTRICT_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(billing_mode AS TEXT))), ''))) AS UUID) AS BILLING_MODE_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(legal_type AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(district AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(billing_mode AS TEXT))), ''), '^^')
+                    ), '^^||^^||^^||^^')) AS UUID) AS MDM_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(registered_at AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(is_vip AS TEXT))), ''), '^^')
+                    )) AS UUID) AS MDM_HASHDIFF
     FROM derived_columns
             ),
             
@@ -318,7 +318,7 @@ mviews = {
                 registered_at AS EFFECTIVE_FROM
     FROM staging
     );
-    ALTER MATERIALIZED VIEW izykov.p_mv_user OWNER TO izykov;
+    ALTER MATERIALIZED VIEW izykov.p_mv_mdm OWNER TO izykov;
     """,
 
     'billing': """
@@ -330,11 +330,11 @@ mviews = {
                     service,
                     tariff, SUM,
                     created_at,
-                    user_id:: VARCHAR AS USER_KEY,
-                    billing_period:: VARCHAR AS BILLING_PERIOD_KEY,
-                    service:: VARCHAR AS SERVICE_KEY,
-                    tariff:: VARCHAR AS TARIFF_KEY,
-                    'BILLING - DATA LAKE':: VARCHAR AS RECORD_SOURCE
+                    user_id:: TEXT AS USER_KEY,
+                    billing_period:: TEXT AS BILLING_PERIOD_KEY,
+                    service:: TEXT AS SERVICE_KEY,
+                    tariff:: TEXT AS TARIFF_KEY,
+                    'BILLING - DATA LAKE':: TEXT AS RECORD_SOURCE
     FROM izykov.p_ods_billing
     WHERE CAST(EXTRACT('year'
     FROM created_at) AS int) = {{ execution_date.year }}
@@ -351,9 +351,9 @@ mviews = {
                     BILLING_PERIOD_KEY,
                     SERVICE_KEY,
                     TARIFF_KEY,             
-                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(billing_period AS VARCHAR))), ''))) AS UUID) AS BILLING_PERIOD_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(service AS VARCHAR))), ''))) AS UUID) AS SERVICE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(tariff AS VARCHAR))), ''))) AS UUID) AS TARIFF_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(billing_period AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(service AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(tariff AS VARCHAR))), ''), '^^')
-                    ), '^^||^^||^^||^^')) AS UUID) AS BILLING_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(created_at AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(SUM AS VARCHAR))), ''), '^^')
-                    )) AS TEXT) AS BILLING_HASHDIFF
+                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(billing_period AS TEXT))), ''))) AS UUID) AS BILLING_PERIOD_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(service AS TEXT))), ''))) AS UUID) AS SERVICE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(tariff AS TEXT))), ''))) AS UUID) AS TARIFF_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(billing_period AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(service AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(tariff AS TEXT))), ''), '^^')
+                    ), '^^||^^||^^||^^')) AS UUID) AS BILLING_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(created_at AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(SUM AS TEXT))), ''), '^^')
+                    )) AS UUID) AS BILLING_HASHDIFF
     FROM derived_columns
             ),
             
@@ -399,12 +399,12 @@ mviews = {
                     phone,
                     billing_period,
                     pay_date, SUM,
-                    user_id:: VARCHAR AS USER_KEY,
-                    account:: VARCHAR AS ACCOUNT_KEY,
-                    billing_period:: VARCHAR AS BILLING_PERIOD_KEY,
-                    pay_doc_type:: VARCHAR AS PAY_DOC_TYPE_KEY,
-                    pay_doc_num:: VARCHAR AS PAY_DOC_NUM_KEY,
-                    'PAYMENT - DATA LAKE':: VARCHAR AS RECORD_SOURCE
+                    user_id:: TEXT AS USER_KEY,
+                    account:: TEXT AS ACCOUNT_KEY,
+                    billing_period:: TEXT AS BILLING_PERIOD_KEY,
+                    pay_doc_type:: TEXT AS PAY_DOC_TYPE_KEY,
+                    pay_doc_num:: TEXT AS PAY_DOC_NUM_KEY,
+                    'PAYMENT - DATA LAKE':: TEXT AS RECORD_SOURCE
     FROM izykov.p_ods_payment
     WHERE CAST(EXTRACT('year'
     FROM CAST(pay_date AS TIMESTAMP)) AS int) = {{ execution_date.year }}           
@@ -424,10 +424,10 @@ mviews = {
                     BILLING_PERIOD_KEY,
                     PAY_DOC_TYPE_KEY,
                     PAY_DOC_NUM_KEY,
-                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(account AS VARCHAR))), ''))) AS UUID) AS ACCOUNT_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(billing_period AS VARCHAR))), ''))) AS UUID) AS BILLING_PERIOD_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(pay_doc_type AS VARCHAR))), ''))) AS UUID) AS PAY_DOC_TYPE_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(account AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(billing_period AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(pay_doc_type AS VARCHAR))), ''), '^^')
-                    ), '^^||^^||^^||^^')) AS UUID) AS PAYMENT_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(phone AS VARCHAR))), ''), '^^')
-                    )) AS TEXT) AS USER_HASHDIFF, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(pay_doc_num AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(pay_date AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(SUM AS VARCHAR))), ''), '^^')                 
-                    )) AS TEXT) AS PAY_DOC_HASHDIFF
+                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(account AS TEXT))), ''))) AS UUID) AS ACCOUNT_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(billing_period AS TEXT))), ''))) AS UUID) AS BILLING_PERIOD_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(pay_doc_type AS TEXT))), ''))) AS UUID) AS PAY_DOC_TYPE_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(account AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(billing_period AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(pay_doc_type AS TEXT))), ''), '^^')
+                    ), '^^||^^||^^||^^')) AS UUID) AS PAYMENT_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(phone AS TEXT))), ''), '^^')
+                    )) AS UUID) AS USER_HASHDIFF, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(pay_doc_num AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(pay_date AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(SUM AS TEXT))), ''), '^^')                 
+                    )) AS UUID) AS PAY_DOC_HASHDIFF
     FROM derived_columns
             ),
             
@@ -476,9 +476,9 @@ mviews = {
                     title,
                     description,
                     service,
-                    user_id:: VARCHAR AS USER_KEY,
-                    service:: VARCHAR AS SERVICE_KEY,
-                    'ISSUE - DATA LAKE':: VARCHAR AS RECORD_SOURCE
+                    user_id:: TEXT AS USER_KEY,
+                    service:: TEXT AS SERVICE_KEY,
+                    'ISSUE - DATA LAKE':: TEXT AS RECORD_SOURCE
     FROM izykov.p_ods_issue
     WHERE CAST(EXTRACT('year'
     FROM start_time) AS int) = {{ execution_date.year }}
@@ -494,9 +494,9 @@ mviews = {
                     service,
                     USER_KEY,
                     SERVICE_KEY,
-                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(service AS VARCHAR))), ''))) AS UUID) AS SERVICE_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(service AS VARCHAR))), ''), '^^')
-                    ), '^^||^^')) AS UUID) AS ISSUE_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(start_time AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(end_time AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(title AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(description AS VARCHAR))), ''), '^^')
-                    )) AS TEXT) AS ISSUE_HASHDIFF
+                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(service AS TEXT))), ''))) AS UUID) AS SERVICE_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(service AS TEXT))), ''), '^^')
+                    ), '^^||^^')) AS UUID) AS ISSUE_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(start_time AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(end_time AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(title AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(description AS TEXT))), ''), '^^')
+                    )) AS UUID) AS ISSUE_HASHDIFF
     FROM derived_columns
             ),
             
@@ -538,10 +538,10 @@ mviews = {
                     device_ip_addr,
                     bytes_sent,
                     bytes_received,
-                    user_id:: VARCHAR AS USER_KEY,
-                    device_id:: VARCHAR AS DEVICE_KEY,
-                    device_ip_addr:: VARCHAR AS IP_ADDR_KEY,
-                    'TRAFFIC - DATA LAKE':: VARCHAR AS RECORD_SOURCE
+                    user_id:: TEXT AS USER_KEY,
+                    device_id:: TEXT AS DEVICE_KEY,
+                    device_ip_addr:: TEXT AS IP_ADDR_KEY,
+                    'TRAFFIC - DATA LAKE':: TEXT AS RECORD_SOURCE
     FROM izykov.p_ods_traffic
     WHERE CAST(EXTRACT('year'
     FROM timestamp) AS int) = {{ execution_date.year }}
@@ -558,9 +558,9 @@ mviews = {
                     USER_KEY,
                     DEVICE_KEY,
                     IP_ADDR_KEY,
-                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_id AS VARCHAR))), ''))) AS UUID) AS DEVICE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS VARCHAR))), ''))) AS UUID) AS IP_ADDR_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_id AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS VARCHAR))), ''), '^^')
-                    ), '^^||^^||^^')) AS UUID) AS TRAFFIC_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(timestamp AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(bytes_sent AS VARCHAR))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(bytes_received AS VARCHAR))), ''), '^^')
-                    )) AS TEXT) AS TRAFFIC_HASHDIFF
+                    RECORD_SOURCE, CAST((MD5(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''))) AS UUID) AS USER_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_id AS TEXT))), ''))) AS UUID) AS DEVICE_PK, CAST((MD5(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS TEXT))), ''))) AS UUID) AS IP_ADDR_PK, CAST(MD5(NULLIF(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(user_id AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_id AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(device_ip_addr AS TEXT))), ''), '^^')
+                    ), '^^||^^||^^')) AS UUID) AS TRAFFIC_PK, CAST(MD5(CONCAT_WS('||', COALESCE(NULLIF(UPPER(TRIM(CAST(timestamp AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(bytes_sent AS TEXT))), ''), '^^'), COALESCE(NULLIF(UPPER(TRIM(CAST(bytes_received AS TEXT))), ''), '^^')
+                    )) AS UUID) AS TRAFFIC_HASHDIFF
     FROM derived_columns
             ),
             
@@ -602,9 +602,9 @@ dds_hubs = {
     'user': """
     CREATE TABLE IF NOT EXISTS izykov.p_dds_hub_user (
         USER_PK UUID, 
-        USER_KEY VARCHAR, 
+        USER_KEY TEXT, 
         LOAD_DATE TIMESTAMP, 
-        RECORD_SOURCE VARCHAR
+        RECORD_SOURCE TEXT
     );
     ALTER TABLE izykov.p_dds_hub_user OWNER TO izykov;
     WITH row_rank_1 AS (
@@ -623,7 +623,7 @@ dds_hubs = {
     SELECT USER_PK, USER_KEY, LOAD_DATE, RECORD_SOURCE, ROW_NUMBER() over (PARTITION BY USER_PK
     ORDER BY LOAD_DATE ASC
                 ) AS row_num
-    FROM izykov.p_mv_user
+    FROM izykov.p_mv_mdm
         ) AS h
     WHERE row_num = 1
     ),
@@ -696,9 +696,9 @@ dds_hubs = {
     'account':"""
     CREATE TABLE IF NOT EXISTS izykov.p_dds_hub_account (
         ACCOUNT_PK UUID, 
-        ACCOUNT_KEY VARCHAR, 
+        ACCOUNT_KEY TEXT, 
         LOAD_DATE TIMESTAMP, 
-        RECORD_SOURCE VARCHAR
+        RECORD_SOURCE TEXT
     );
     ALTER TABLE izykov.p_dds_hub_account OWNER TO izykov;
     WITH row_rank_1 AS (
@@ -727,9 +727,9 @@ dds_hubs = {
     'billing_period':"""
     CREATE TABLE IF NOT EXISTS izykov.p_dds_hub_billing_period (
         BILLING_PERIOD_PK UUID, 
-        BILLING_PERIOD_KEY VARCHAR, 
+        BILLING_PERIOD_KEY TEXT, 
         LOAD_DATE TIMESTAMP, 
-        RECORD_SOURCE VARCHAR
+        RECORD_SOURCE TEXT
     );
     ALTER TABLE izykov.p_dds_hub_billing_period OWNER TO izykov;
     WITH row_rank_1 AS (
@@ -785,9 +785,9 @@ dds_hubs = {
     'pay_doc_type': """
     CREATE TABLE IF NOT EXISTS izykov.p_dds_hub_pay_doc_type (
         PAY_DOC_TYPE_PK UUID, 
-        PAY_DOC_TYPE_KEY VARCHAR, 
+        PAY_DOC_TYPE_KEY TEXT, 
         LOAD_DATE TIMESTAMP, 
-        RECORD_SOURCE VARCHAR
+        RECORD_SOURCE TEXT
     );
     ALTER TABLE izykov.p_dds_hub_pay_doc_type OWNER TO izykov;
     WITH row_rank_1 AS (
@@ -809,6 +809,259 @@ dds_hubs = {
     INSERT INTO izykov.p_dds_hub_pay_doc_type (PAY_DOC_TYPE_PK, PAY_DOC_TYPE_KEY, LOAD_DATE, RECORD_SOURCE)
     (
     SELECT PAY_DOC_TYPE_PK, PAY_DOC_TYPE_KEY, LOAD_DATE, RECORD_SOURCE
+    FROM records_to_insert
+    );
+    """,
+}
+
+
+
+### Таблицы + SQL для заливки линков DDS-слоя
+dds_links = {
+    'payment':"""
+    CREATE TABLE IF NOT EXISTS izykov.p_dds_link_payment (
+        PAYMENT_PK UUID,
+        USER_PK UUID, 
+        ACCOUNT_PK UUID, 
+        BILLING_PERIOD_PK UUID, 
+        PAY_DOC_TYPE_PK UUID,
+        LOAD_DATE TIMESTAMP,
+        RECORD_SOURCE TEXT
+    );
+    ALTER TABLE izykov.p_dds_link_payment OWNER TO izykov;
+    WITH source_data AS (
+    SELECT 
+            PAYMENT_PK,
+            USER_PK, ACCOUNT_PK, BILLING_PERIOD_PK, PAY_DOC_TYPE_PK,
+            LOAD_DATE, RECORD_SOURCE
+    FROM izykov.p_mv_payment_{{ execution_date.year }}
+    ),
+    records_to_insert AS (
+    SELECT DISTINCT 
+            stg.PAYMENT_PK, 
+            stg.USER_PK, stg.ACCOUNT_PK, stg.BILLING_PERIOD_PK, stg.PAY_DOC_TYPE_PK,
+            stg.LOAD_DATE, stg.RECORD_SOURCE
+    FROM source_data AS stg
+    LEFT JOIN izykov.p_dds_link_payment AS tgt ON stg.PAYMENT_PK = tgt.PAYMENT_PK
+    WHERE tgt.PAYMENT_PK IS NULL        
+    )
+    INSERT INTO izykov.p_dds_link_payment (
+        PAYMENT_PK,
+        USER_PK, ACCOUNT_PK, BILLING_PERIOD_PK, PAY_DOC_TYPE_PK,
+        LOAD_DATE, RECORD_SOURCE)
+    (
+    SELECT 
+            PAYMENT_PK,
+            USER_PK, ACCOUNT_PK, BILLING_PERIOD_PK, PAY_DOC_TYPE_PK,
+            LOAD_DATE, RECORD_SOURCE
+    FROM records_to_insert
+    );
+    """,
+
+    # 'mdm':"""
+
+    # """,
+}
+
+
+
+### Таблицы + SQL для заливки саттелитов DDS-слоя
+dds_sats = {
+    'user':"""
+    CREATE TABLE IF NOT EXISTS izykov.p_dds_sat_user (
+        USER_PK UUID, 
+        USER_HASHDIFF UUID, 
+        phone NUMERIC(11,0),
+        EFFECTIVE_FROM TIMESTAMP, 
+        LOAD_DATE TIMESTAMP,
+        RECORD_SOURCE TEXT
+    );
+    ALTER TABLE izykov.p_dds_sat_user OWNER TO izykov;
+    WITH source_data AS (
+    SELECT *
+    FROM (
+    SELECT 
+                USER_PK, USER_HASHDIFF, 
+                phone, 
+                EFFECTIVE_FROM, 
+                LOAD_DATE, RECORD_SOURCE,
+                lag(phone) OVER (PARTITION BY USER_PK
+    ORDER BY EFFECTIVE_FROM) AS prev_state
+    FROM izykov.p_mv_payment_{{ execution_date.year }}
+        ) AS sd
+    WHERE phone IS DISTINCT
+    FROM prev_state
+    ),
+    update_records AS (
+    SELECT 
+            a.USER_PK, a.USER_HASHDIFF, 
+            a.phone, 
+            a.EFFECTIVE_FROM, 
+            a.LOAD_DATE, a.RECORD_SOURCE
+    FROM izykov.p_dds_sat_user AS a
+    JOIN source_data AS b ON a.USER_PK = b.USER_PK
+    WHERE a.LOAD_DATE <= b.LOAD_DATE
+    ),
+    latest_records AS (
+    SELECT *
+    FROM (
+    SELECT USER_PK, USER_HASHDIFF, LOAD_DATE, CASE WHEN RANK() over (PARTITION BY USER_PK
+    ORDER BY LOAD_DATE DESC) = 1 THEN 'Y' ELSE 'N' END AS latest
+    FROM update_records
+        ) AS s
+    WHERE latest = 'Y'
+    ),  
+    records_to_insert AS (
+    SELECT DISTINCT 
+            e.USER_PK, e.USER_HASHDIFF, 
+            e.phone, 
+            e.EFFECTIVE_FROM, 
+            e.LOAD_DATE, e.RECORD_SOURCE
+    FROM source_data AS e
+    LEFT JOIN latest_records ON latest_records.USER_HASHDIFF = e.USER_HASHDIFF AND 
+         latest_records.USER_PK = e.USER_PK
+    WHERE latest_records.USER_HASHDIFF IS NULL
+    )
+    INSERT INTO izykov.p_dds_sat_user (
+        USER_PK, USER_HASHDIFF, 
+        phone, 
+        EFFECTIVE_FROM, 
+        LOAD_DATE, RECORD_SOURCE)
+    (
+    SELECT 
+            USER_PK, USER_HASHDIFF, 
+            phone, 
+            EFFECTIVE_FROM, 
+            LOAD_DATE, RECORD_SOURCE
+    FROM records_to_insert
+    );
+    """,
+
+    'payment':"""
+    CREATE TABLE IF NOT EXISTS izykov.p_dds_sat_payment (
+        PAYMENT_PK UUID, 
+        PAY_DOC_HASHDIFF UUID, 
+        pay_doc_num INT, 
+        pay_date DATE, 
+        sum INT,
+        EFFECTIVE_FROM TIMESTAMP, 
+        LOAD_DATE TIMESTAMP,
+        RECORD_SOURCE TEXT
+    );
+    ALTER TABLE izykov.p_dds_sat_payment OWNER TO izykov;
+    WITH source_data AS (
+    SELECT 
+            PAYMENT_PK, PAY_DOC_HASHDIFF, 
+            pay_doc_num, pay_date, SUM, 
+            EFFECTIVE_FROM, 
+            LOAD_DATE, RECORD_SOURCE
+    FROM izykov.p_mv_payment_{{ execution_date.year }}
+    ),
+    update_records AS (
+    SELECT 
+            a.PAYMENT_PK, a.PAY_DOC_HASHDIFF, 
+            a.pay_doc_num, a.pay_date, a.sum,
+            a.EFFECTIVE_FROM, 
+            a.LOAD_DATE, a.RECORD_SOURCE
+    FROM izykov.p_dds_sat_payment AS a
+    JOIN source_data AS b ON a.PAYMENT_PK = b.PAYMENT_PK
+    WHERE a.LOAD_DATE <= b.LOAD_DATE
+    ),
+    latest_records AS (
+    SELECT *
+    FROM (
+    SELECT PAYMENT_PK, PAY_DOC_HASHDIFF, LOAD_DATE, CASE WHEN RANK() over (PARTITION BY PAYMENT_PK
+    ORDER BY LOAD_DATE DESC) = 1 THEN 'Y' ELSE 'N' END AS latest
+    FROM update_records
+        ) AS s
+    WHERE latest = 'Y'
+    ),  
+    records_to_insert AS (
+    SELECT DISTINCT 
+            e.PAYMENT_PK, e.PAY_DOC_HASHDIFF, 
+            e.pay_doc_num, e.pay_date, e.sum,
+            e.EFFECTIVE_FROM, 
+            e.LOAD_DATE, e.RECORD_SOURCE
+    FROM source_data AS e
+    LEFT JOIN latest_records ON latest_records.PAY_DOC_HASHDIFF = e.PAY_DOC_HASHDIFF AND 
+         latest_records.PAYMENT_PK = e.PAYMENT_PK
+    WHERE latest_records.PAY_DOC_HASHDIFF IS NULL
+    )
+    INSERT INTO izykov.p_dds_sat_payment (
+        PAYMENT_PK, PAY_DOC_HASHDIFF, 
+        pay_doc_num, pay_date, SUM, 
+        EFFECTIVE_FROM, 
+        LOAD_DATE, RECORD_SOURCE)
+    (
+    SELECT 
+            PAYMENT_PK, PAY_DOC_HASHDIFF, 
+            pay_doc_num, pay_date, SUM, 
+            EFFECTIVE_FROM, 
+            LOAD_DATE, RECORD_SOURCE
+    FROM records_to_insert
+    );
+    """,
+
+    'mdm':"""
+    CREATE TABLE IF NOT EXISTS izykov.p_dds_sat_mdm (
+        MDM_PK UUID, 
+        MDM_HASHDIFF UUID, 
+        registered_at TIMESTAMP, 
+        is_vip BOOL,
+        EFFECTIVE_FROM TIMESTAMP, 
+        LOAD_DATE TIMESTAMP,
+        RECORD_SOURCE TEXT
+    );
+    ALTER TABLE izykov.p_dds_sat_mdm OWNER TO izykov;
+    WITH source_data AS (
+    SELECT 
+            MDM_PK, MDM_HASHDIFF, 
+            registered_at, is_vip,
+            EFFECTIVE_FROM, 
+            LOAD_DATE, RECORD_SOURCE
+    FROM izykov.p_mv_mdm
+    ),
+    update_records AS (
+    SELECT 
+            a.MDM_PK, a.MDM_HASHDIFF, 
+            a.registered_at, a.is_vip,
+            a.EFFECTIVE_FROM, 
+            a.LOAD_DATE, a.RECORD_SOURCE
+    FROM izykov.p_dds_sat_mdm AS a
+    JOIN source_data AS b ON a.MDM_PK = b.MDM_PK
+    WHERE a.LOAD_DATE <= b.LOAD_DATE
+    ),
+    latest_records AS (
+    SELECT *
+    FROM (
+    SELECT MDM_PK, MDM_HASHDIFF, LOAD_DATE, CASE WHEN RANK() over (PARTITION BY MDM_PK
+    ORDER BY LOAD_DATE DESC) = 1 THEN 'Y' ELSE 'N' END AS latest
+    FROM update_records
+        ) AS s
+    WHERE latest = 'Y'
+    ),  
+    records_to_insert AS (
+    SELECT DISTINCT 
+            e.MDM_PK, e.MDM_HASHDIFF, 
+            e.registered_at, e.is_vip,
+            e.EFFECTIVE_FROM, 
+            e.LOAD_DATE, e.RECORD_SOURCE
+    FROM source_data AS e
+    LEFT JOIN latest_records ON latest_records.MDM_HASHDIFF = e.MDM_HASHDIFF AND 
+         latest_records.MDM_PK = e.MDM_PK
+    WHERE latest_records.MDM_HASHDIFF IS NULL
+    )
+    INSERT INTO izykov.p_dds_sat_mdm (
+        MDM_PK, MDM_HASHDIFF, 
+        registered_at, is_vip,
+        EFFECTIVE_FROM, 
+        LOAD_DATE, RECORD_SOURCE)
+    (
+    SELECT 
+            MDM_PK, MDM_HASHDIFF, 
+            registered_at, is_vip,
+            EFFECTIVE_FROM, 
+            LOAD_DATE, RECORD_SOURCE
     FROM records_to_insert
     );
     """,
