@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.latest_only_operator import LatestOnlyOperator
-# единорог
+
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
 import sys
@@ -13,8 +13,8 @@ import izykov_final_config as c
 ### Общие параметры DAG
 default_args = {
     'owner': USERNAME,
-    'start_date': datetime(2013, 1, 1, 0, 0, 0),   # данные начинаются с 2013
-    # 'end_date': datetime(2019, 1, 1, 0, 0, 0),     # за 2020 - всего несколько строк в issue, больше данных НЕТ
+    'start_date': datetime(2013, 1, 1, 0, 0, 0),   # у нас данные начинаются с 2013, идут до 2019, за 2020 - всего несколько строк в issue
+    # 'end_date': datetime(2019, 1, 1, 0, 0, 0),   # минус ограничения: не работает LatestOnlyOperator
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
@@ -125,8 +125,29 @@ def load_dm():
     loo = LatestOnlyOperator(task_id = "dm_latest_only", dag = dag)
     dm_tmp_begin = DummyOperator(task_id = "dm_tmp_begin", dag = dag)
     dm_tmp_end_dm_dims_begin = DummyOperator(task_id = "dm_tmp_end_dm_dims_begin", dag = dag)
-    dm_dims_end_dm_facts = DummyOperator(task_id = "dm_dims_end_dm_facts", dag = dag)
-    c.dds_sats_end_dm_begin >> loo >> dm_tmp_begin >> dm_tmp_end_dm_dims_begin >> dm_dims_end_dm_facts
+    dm_dims_end_dm_facts_begin = DummyOperator(task_id = "dm_dims_end_dm_facts", dag = dag)
+    c.dds_sats_end_dm_begin >> loo >> dm_tmp_begin
+    for table, sql in c.dm_tmp.items():
+        po = PostgresOperator(
+            dag = dag,
+            task_id = 'dm_tmp_' + table + '_recreate',
+            sql = sql
+        )
+        dm_tmp_begin >> po >> dm_tmp_end_dm_dims_begin
+    for table, sql in c.dm_dims.items():
+        po = PostgresOperator(
+            dag = dag,
+            task_id = 'dm_dim_' + table + '_recreate',
+            sql = sql
+        )
+        dm_tmp_end_dm_dims_begin >> po >> dm_dims_end_dm_facts_begin
+    for table, sql in c.dm_facts.items():
+        po = PostgresOperator(
+            dag = dag,
+            task_id = 'dm_fact_' + table + '_recreate',
+            sql = sql
+        )
+        dm_dims_end_dm_facts_begin >> po
     return
 
 ### Запуск главного алгоритма
