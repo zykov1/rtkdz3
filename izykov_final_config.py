@@ -1072,7 +1072,7 @@ dds_sats = {
 ### tmp-таблицы для отчетов
 dm_tmp = {
     'payment_report':"""
-    DROP TABLE IF EXISTS izykov.p_report_tmp;
+    DROP TABLE IF EXISTS izykov.p_report_tmp CASCADE;
     CREATE TABLE izykov.p_report_tmp AS
     WITH raw_data AS (
       SELECT
@@ -1104,35 +1104,35 @@ dm_tmp = {
 # Измерения отчетов
 dm_dims = {
     'payment_billing_year':"""
-    DROP TABLE IF EXISTS izykov.p_report_dim_billing_year;
+    DROP TABLE IF EXISTS izykov.p_report_dim_billing_year CASCADE;
     CREATE TABLE izykov.p_report_dim_billing_year(id SMALLSERIAL PRIMARY KEY, billing_year_key SMALLINT);
     ALTER TABLE izykov.p_report_dim_billing_year OWNER TO izykov;
     INSERT INTO izykov.p_report_dim_billing_year (billing_year_key) SELECT DISTINCT billing_year FROM izykov.p_report_tmp ORDER BY billing_year;
     """, 
 
     'payment_legal_type':"""
-    DROP TABLE IF EXISTS izykov.p_report_dim_legal_type;
+    DROP TABLE IF EXISTS izykov.p_report_dim_legal_type CASCADE;
     CREATE TABLE izykov.p_report_dim_legal_type(id SMALLSERIAL PRIMARY KEY, legal_type_key TEXT);
     ALTER TABLE izykov.p_report_dim_legal_type OWNER TO izykov;
     INSERT INTO izykov.p_report_dim_legal_type (legal_type_key) SELECT DISTINCT legal_type FROM izykov.p_report_tmp ORDER BY legal_type;
     """, 
 
     'payment_district':"""
-    DROP TABLE IF EXISTS izykov.p_report_dim_district;
+    DROP TABLE IF EXISTS izykov.p_report_dim_district CASCADE;
     CREATE TABLE izykov.p_report_dim_district(id SMALLSERIAL PRIMARY KEY, district_key TEXT);
     ALTER TABLE izykov.p_report_dim_district OWNER TO izykov;
     INSERT INTO izykov.p_report_dim_district (district_key) SELECT DISTINCT district FROM izykov.p_report_tmp ORDER BY district;
     """, 
 
     'payment_registration_year':"""
-    DROP TABLE IF EXISTS izykov.p_report_dim_registration_year;
+    DROP TABLE IF EXISTS izykov.p_report_dim_registration_year CASCADE;
     CREATE TABLE izykov.p_report_dim_registration_year(id SMALLSERIAL PRIMARY KEY, registration_year_key SMALLINT);
     ALTER TABLE izykov.p_report_dim_registration_year OWNER TO izykov;
     INSERT INTO izykov.p_report_dim_registration_year (registration_year_key) SELECT DISTINCT registration_year FROM izykov.p_report_tmp ORDER BY registration_year;
     """, 
 
     'payment_billing_mode':"""
-    DROP TABLE IF EXISTS izykov.p_report_dim_billing_mode;
+    DROP TABLE IF EXISTS izykov.p_report_dim_billing_mode CASCADE;
     CREATE TABLE izykov.p_report_dim_billing_mode(id SMALLSERIAL PRIMARY KEY, billing_mode_key TEXT);
     ALTER TABLE izykov.p_report_dim_billing_mode OWNER TO izykov;
     INSERT INTO izykov.p_report_dim_billing_mode (billing_mode_key) SELECT DISTINCT billing_mode FROM izykov.p_report_tmp ORDER BY billing_mode;
@@ -1144,7 +1144,7 @@ dm_dims = {
 # Факты
 dm_facts = {
     'payment':"""
-    DROP TABLE IF EXISTS izykov.p_report_fct;
+    DROP TABLE IF EXISTS izykov.p_report_fct CASCADE;
     CREATE TABLE izykov.p_report_fct(
       billing_year_id SMALLINT
       , legal_type_id SMALLINT
