@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.latest_only_operator import LatestOnlyOperator
-# жирафле
+# носорог
 ### Конфиг (внутри общие объекты и запросы)
 USERNAME = 'izykov'
 import sys
@@ -26,10 +26,10 @@ dag = DAG(
     default_args = default_args,
     description = USERNAME + ' FINAL ETL TEST',
     schedule_interval = "0 0 1 1 *",
-    concurrency=1,
+    # concurrency = 1,
     max_active_runs = 1
 )
-# все dummy-точки сбора
+# Все dummy-точки сбора
 c.stg_end_ods_begin = DummyOperator(task_id = "stg_end_ods_begin", dag = dag)
 c.ods_end_mviews_begin = DummyOperator(task_id = "ods_end_mviews_begin", dag = dag)
 c.mviews_end_dds_hubs_begin = DummyOperator(task_id = "mviews_end_dds_hubs_begin", dag = dag)
@@ -102,11 +102,23 @@ def load_dds_hubs():
     return
 
 def load_dds_links():
-    c.dds_hubs_end_dds_links_begin >> c.dds_links_end_dds_sats_begin
+    for table, sql in c.dds_links.items():
+        po = PostgresOperator(
+            dag = dag,
+            task_id = 'dds_link_' + table + '_load',
+            sql = sql
+        )
+        c.dds_hubs_end_dds_links_begin >> po >> c.dds_links_end_dds_sats_begin
     return
 
 def load_dds_sats():
-    c.dds_links_end_dds_sats_begin >> c.dds_sats_end_dm_begin
+    for table, sql in c.dds_links.items():
+        po = PostgresOperator(
+            dag = dag,
+            task_id = 'dds_sat_' + table + '_load',
+            sql = sql
+        )
+        c.dds_links_end_dds_sats_begin >> po >> c.dds_sats_end_dm_begin
     return
 
 def load_dm():
