@@ -1,0 +1,117 @@
+{
+  "data_asset_type": "Dataset",
+  "expectation_suite_name": "izykov.ods_issue.warning",
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "user_id"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "user_id",
+        "type_": "INTEGER"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "start_time"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "start_time",
+        "type_": "TIMESTAMP"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "start_time",
+        "max_value": "2022-01-01",
+        "min_value": "2013-01-01"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "end_time"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "end_time",
+        "type_": "TIMESTAMP"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "end_time",
+        "max_value": "2022-01-01",
+        "min_value": "2013-01-01"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "title"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "title",
+        "type_": "TEXT"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "service"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "service",
+        "type_": "TEXT"
+      },
+      "meta": {}
+    }
+  ],
+  "meta": {
+    "citations": [
+      {
+        "batch_kwargs": {
+          "data_asset_name": "izykov.ods_issue",
+          "datasource": "greplu",
+          "limit": 1000,
+          "schema": "izykov",
+          "table": "p_ods_issue"
+        },
+        "batch_markers": null,
+        "batch_parameters": null,
+        "citation_date": "20210504T193420.752577Z",
+        "comment": "New suite added via CLI"
+      }
+    ],
+    "great_expectations_version": "0.13.14"
+  }
+}

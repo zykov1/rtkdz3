@@ -1,0 +1,110 @@
+{
+  "data_asset_type": "Dataset",
+  "expectation_suite_name": "izykov.ods_traffic.warning",
+  "expectations": [
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "user_id"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "user_id",
+        "type_": "INTEGER"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "timestamp",
+        "type_": "TIMESTAMP"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "timestamp",
+        "max_value": "2022-01-01",
+        "min_value": "2012-01-01"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "device_id"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "device_id",
+        "type_": "TEXT"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": {
+        "column": "device_id",
+        "regex": "^d\\d{9}$"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "device_ip_addr"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "device_ip_addr",
+        "type_": "INET"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "bytes_received",
+        "type_": "BIGINT"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "bytes_sent",
+        "type_": "BIGINT"
+      },
+      "meta": {}
+    }
+  ],
+  "meta": {
+    "citations": [
+      {
+        "batch_kwargs": {
+          "data_asset_name": "izykov.ods_traffic",
+          "datasource": "greplu",
+          "limit": 1000,
+          "schema": "izykov",
+          "table": "p_ods_traffic"
+        },
+        "batch_markers": null,
+        "batch_parameters": null,
+        "citation_date": "20210504T190555.038813Z",
+        "comment": "New suite added via CLI"
+      }
+    ],
+    "great_expectations_version": "0.13.14"
+  }
+}

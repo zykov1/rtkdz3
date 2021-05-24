@@ -1,0 +1,260 @@
+{
+  "data_asset_type": "Dataset",
+  "expectation_suite_name": "izykov.ods_payment.warning",
+  "expectations": [
+    {
+      "expectation_type": "expect_compound_columns_to_be_unique",
+      "kwargs": {
+        "column_list": [
+          "pay_doc_type",
+          "pay_doc_num"
+        ]
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "user_id"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "user_id",
+        "type_": "INTEGER"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "pay_doc_type"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "pay_doc_type",
+        "type_": "TEXT"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_distinct_values_to_be_in_set",
+      "kwargs": {
+        "column": "pay_doc_type",
+        "value_set": [
+          "MASTER",
+          "MIR",
+          "VISA"
+        ]
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_distinct_values_to_equal_set",
+      "kwargs": {
+        "column": "pay_doc_type",
+        "value_set": [
+          "MASTER",
+          "MIR",
+          "VISA"
+        ]
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "pay_doc_num"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "pay_doc_num",
+        "type_": "INTEGER"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "account"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "account",
+        "type_": "TEXT"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_match_regex",
+      "kwargs": {
+        "column": "account",
+        "regex": "^FL-\\d+$"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "phone",
+        "type_": "NUMERIC"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "phone",
+        "max_value": 79999999999,
+        "min_value": 70000000000
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "billing_period"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "billing_period",
+        "type_": "DATE"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "billing_period",
+        "max_value": "2022-01-01",
+        "min_value": "2012-01-01"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "pay_date"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "pay_date",
+        "type_": "DATE"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "pay_date",
+        "max_value": "2022-01-01",
+        "min_value": "2012-01-01"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "sum"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+        "column": "sum",
+        "type_": "INTEGER"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_be_between",
+      "kwargs": {
+        "column": "sum",
+        "max_value": 99999999,
+        "min_value": 0
+      },
+      "meta": {}
+    }
+  ],
+  "meta": {
+    "BasicSuiteBuilderProfiler": {
+      "batch_kwargs": {
+        "data_asset_name": "izykov.ods_payment",
+        "datasource": "greplu",
+        "limit": 1000,
+        "schema": "izykov",
+        "table": "p_ods_payment"
+      },
+      "created_at": 1619958514.3852065,
+      "created_by": "BasicSuiteBuilderProfiler"
+    },
+    "citations": [
+      {
+        "batch_kwargs": {
+          "data_asset_name": "izykov.ods_payment",
+          "datasource": "greplu",
+          "limit": 1000,
+          "schema": "izykov",
+          "table": "p_ods_payment"
+        },
+        "batch_markers": {
+          "ge_load_time": "20210502T122824.761940Z"
+        },
+        "batch_parameters": null,
+        "citation_date": "20210502T122837.323260Z",
+        "comment": "BasicSuiteBuilderProfiler added a citation based on the current batch."
+      }
+    ],
+    "columns": {
+      "account": {
+        "description": ""
+      },
+      "billing_period": {
+        "description": ""
+      },
+      "pay_date": {
+        "description": ""
+      },
+      "pay_doc_num": {
+        "description": ""
+      },
+      "pay_doc_type": {
+        "description": ""
+      },
+      "phone": {
+        "description": ""
+      },
+      "sum": {
+        "description": ""
+      },
+      "user_id": {
+        "description": ""
+      }
+    },
+    "great_expectations_version": "0.13.14",
+    "notes": {
+      "content": [
+        "#### This is an _example_ suite\n\n- This suite was made by quickly glancing at 1000 rows of your data.\n- This is **not a production suite**. It is meant to show examples of expectations.\n- Because this suite was auto-generated using a very basic profiler that does not know your data like you do, many of the expectations may not be meaningful.\n"
+      ],
+      "format": "markdown"
+    }
+  }
+}
